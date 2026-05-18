@@ -127,7 +127,7 @@ public final class AuctionLitePlugin extends JavaPlugin implements Listener, Com
             return;
         }
 
-        if (listings.size() >= Math.max(1, getConfig().getInt("max-listings", 45))) {
+        if (listings.size() >= maxListings()) {
             send(player, "full");
             return;
         }
@@ -153,6 +153,9 @@ public final class AuctionLitePlugin extends JavaPlugin implements Listener, Com
         holder.inventory(inventory);
         int slot = 0;
         for (Listing listing : listings.values()) {
+            if (slot >= inventory.getSize()) {
+                break;
+            }
             ItemStack item = listing.item().clone();
             ItemMeta meta = item.getItemMeta();
             List<Component> lore = meta.hasLore() && meta.lore() != null ? meta.lore() : new java.util.ArrayList<>();
@@ -256,15 +259,23 @@ public final class AuctionLitePlugin extends JavaPlugin implements Listener, Com
         for (String key : getConfig().getConfigurationSection("listings").getKeys(false)) {
             String path = "listings." + key;
             ItemStack item = getConfig().getItemStack(path + ".item");
-            if (item != null) {
-                UUID id = UUID.fromString(key);
+            if (item != null && !item.getType().isAir()) {
                 try {
+                    UUID id = UUID.fromString(key);
+                    String sellerValue = getConfig().getString(path + ".seller");
+                    if (sellerValue == null) {
+                        continue;
+                    }
                     int price = Math.max(1, Math.min(MAX_PRICE, getConfig().getInt(path + ".price")));
-                    listings.put(id, new Listing(id, UUID.fromString(getConfig().getString(path + ".seller")), getConfig().getString(path + ".seller-name", "unknown"), price, item));
-                } catch (IllegalArgumentException ignored) {
+                    listings.put(id, new Listing(id, UUID.fromString(sellerValue), getConfig().getString(path + ".seller-name", "unknown"), price, item));
+                } catch (RuntimeException ignored) {
                 }
             }
         }
+    }
+
+    private int maxListings() {
+        return Math.min(54, Math.max(1, getConfig().getInt("max-listings", 45)));
     }
 
     private void saveListings() {

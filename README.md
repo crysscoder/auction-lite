@@ -2,7 +2,7 @@
 
 ![Paper](https://img.shields.io/badge/Paper-1.21.11-22c55e?style=for-the-badge)
 ![Java](https://img.shields.io/badge/Java-21-f97316?style=for-the-badge&logo=openjdk)
-![Version](https://img.shields.io/badge/version-1.0.1-111827?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.0.2-111827?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-2563eb?style=for-the-badge)
 
 Мини-аукцион с покупкой предметов за алмазы.

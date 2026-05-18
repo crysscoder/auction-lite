@@ -3,7 +3,7 @@
 }
 
 group = "io.github.crysscoder"
-version = "1.0.1"
+version = "1.0.2"
 
 val pluginVersion = version.toString()
 
