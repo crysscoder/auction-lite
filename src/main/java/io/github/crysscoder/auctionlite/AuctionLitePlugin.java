@@ -29,6 +29,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public final class AuctionLitePlugin extends JavaPlugin implements Listener, CommandExecutor, TabCompleter {
+    private static final int MAX_PRICE = 2304;
     private final Map<UUID, Listing> listings = new LinkedHashMap<>();
     private final LegacyComponentSerializer legacy = LegacyComponentSerializer.legacyAmpersand();
 
@@ -121,7 +122,7 @@ public final class AuctionLitePlugin extends JavaPlugin implements Listener, Com
             return;
         }
 
-        if (price <= 0) {
+        if (price <= 0 || price > MAX_PRICE) {
             send(player, "bad-price");
             return;
         }
@@ -221,19 +222,30 @@ public final class AuctionLitePlugin extends JavaPlugin implements Listener, Com
     }
 
     private void addPayout(UUID seller, int amount) {
-        getConfig().set("payouts." + seller, getConfig().getInt("payouts." + seller, 0) + amount);
+        int current = getConfig().getInt("payouts." + seller, 0);
+        getConfig().set("payouts." + seller, Math.min(MAX_PRICE, current + amount));
     }
 
     private void pay(Player player) {
-        int amount = getConfig().getInt("payouts." + player.getUniqueId(), 0);
+        int amount = Math.max(0, Math.min(MAX_PRICE, getConfig().getInt("payouts." + player.getUniqueId(), 0)));
         if (amount <= 0) {
             send(player, "no-payouts");
             return;
         }
         getConfig().set("payouts." + player.getUniqueId(), null);
         saveConfig();
-        player.getInventory().addItem(new ItemStack(Material.DIAMOND, amount)).values().forEach(item -> player.getWorld().dropItemNaturally(player.getLocation(), item));
+        giveDiamonds(player, amount);
         send(player, "payouts", Map.of("amount", String.valueOf(amount)));
+    }
+
+    private void giveDiamonds(Player player, int amount) {
+        int left = amount;
+
+        while (left > 0) {
+            int stack = Math.min(64, left);
+            player.getInventory().addItem(new ItemStack(Material.DIAMOND, stack)).values().forEach(item -> player.getWorld().dropItemNaturally(player.getLocation(), item));
+            left -= stack;
+        }
     }
 
     private void loadListings() {
@@ -246,7 +258,11 @@ public final class AuctionLitePlugin extends JavaPlugin implements Listener, Com
             ItemStack item = getConfig().getItemStack(path + ".item");
             if (item != null) {
                 UUID id = UUID.fromString(key);
-                listings.put(id, new Listing(id, UUID.fromString(getConfig().getString(path + ".seller")), getConfig().getString(path + ".seller-name", "unknown"), getConfig().getInt(path + ".price"), item));
+                try {
+                    int price = Math.max(1, Math.min(MAX_PRICE, getConfig().getInt(path + ".price")));
+                    listings.put(id, new Listing(id, UUID.fromString(getConfig().getString(path + ".seller")), getConfig().getString(path + ".seller-name", "unknown"), price, item));
+                } catch (IllegalArgumentException ignored) {
+                }
             }
         }
     }
