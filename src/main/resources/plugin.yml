@@ -1,0 +1,19 @@
+name: AuctionLite
+version: ${version}
+main: io.github.crysscoder.auctionlite.AuctionLitePlugin
+api-version: '1.21'
+author: crysscoder
+description: Small diamond-based auction house.
+commands:
+  auction:
+    description: Open or sell on auction.
+    usage: /auction
+    aliases:
+      - ah
+permissions:
+  auctionlite.use:
+    description: Use AuctionLite.
+    default: true
+  auctionlite.reload:
+    description: Reload AuctionLite config.
+    default: op

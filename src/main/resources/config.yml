@@ -1,0 +1,16 @@
+max-listings: 45
+messages:
+  prefix: "&7[&aAuction&7]"
+  only-player: "%prefix% &fКоманда доступна только игроку."
+  no-permission: "%prefix% &fНет прав."
+  reloaded: "%prefix% &fКонфиг перезагружен."
+  listed: "%prefix% &fПредмет выставлен за &a%price% алм.&f."
+  bought: "%prefix% &fПокупка прошла."
+  sold: "%prefix% &fТвой предмет купили за &a%price% алм.&f."
+  no-item: "%prefix% &fВозьми предмет в руку."
+  no-diamonds: "%prefix% &fНе хватает алмазов."
+  bad-price: "%prefix% &fЦена должна быть числом."
+  full: "%prefix% &fАукцион заполнен."
+  own: "%prefix% &fНельзя купить свой лот."
+  payouts: "%prefix% &fВыплата: &a%amount% алм.&f."
+  no-payouts: "%prefix% &fВыплат нет."
